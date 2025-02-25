@@ -34,7 +34,7 @@ std::vector<bool> PngDataEmbedder::dataToBinary(const std::string &data) const
 std::string PngDataEmbedder::binaryToData(const std::vector<bool> &binData) const
 {
     // Validate given data.
-    //if (binData.size() % 8 != 0)
+    // if (binData.size() % 8 != 0)
     //{
     //    throw std::invalid_argument("The size of the vector must be a multiple of 8.");
     //}
@@ -70,6 +70,7 @@ bool PngDataEmbedder::embedData(const std::string &data)
         }
         // Iterate through every pixel.
         size_t index = 0;
+        bool writeComplete = false;
         for (size_t i = 0; i < image.rows; i++)
         {
             for (size_t j = 0; j < image.cols; j++)
@@ -79,18 +80,20 @@ bool PngDataEmbedder::embedData(const std::string &data)
                 {
                     // Clear least significant bit.
                     pixel[k] &= 0xFE;
-                    pixel[k] |= binData[index];
-                    index++;
-                    if (index >= binData.size())
+                    if (!writeComplete)
                     {
-                        return true;
+                        pixel[k] |= binData[index];
+                        index++;
+                        if (index >= binData.size())
+                        {
+                            writeComplete = true;
+                        }
                     }
                 }
             }
         }
 
-        std::cerr << "Implemention error" << std::endl;
-        return false;
+        return true;
     }
 }
 
